@@ -36,3 +36,20 @@ class Task(BaseModel):
                 "completed": False
             }
         }
+
+class UpdateTask(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    completed: Optional[bool] = False
+    
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "title": "Mi tarea",
+                "description": "Esta es una descripción de la tarea",
+                "completed": False
+            }
+        }

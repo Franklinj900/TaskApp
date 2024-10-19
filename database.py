@@ -31,13 +31,15 @@ async def create_task(task):
     created_task = await collection.find_one({"_id": new_task.inserted_id})
     return created_task
 
-async def update_task(id:str, task):
-    await collection.update_one({'_id': id}, {'$set': task})
-    updated_task = await collection.find_one({"_id": id})
+async def update_task(id:str, data):
+    task = {k: v for k, v in data.dict().items() if v is not None}
+    print(task)
+    await collection.update_one({'_id': ObjectId(id)}, {'$set': task})
+    updated_task = await collection.find_one({"_id": ObjectId(id)})
     return updated_task
 
 async def delete_task(id:str):
-    await collection.delete_one({"_id": id})
+    await collection.delete_one({"_id": ObjectId(id)})
     return True
 
 
