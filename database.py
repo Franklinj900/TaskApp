@@ -8,10 +8,14 @@ collection = database.tasks
 
 
 async def get_one_task_id(id):
-
     task = await collection.find_one({"_id": id})
     return task
 
+
+
+async def get_one_task(title):
+    task = await collection.find_one({"title": title})
+    return task
 
 async def get_all_task():
     tasks = []
