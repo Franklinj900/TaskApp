@@ -24,7 +24,7 @@ async def save_task(task: Task):
         return response
     raise HTTPException(400, 'Something went wrong')
 
-@app.get('/api/tasks/{id}')
+@app.get('/api/tasks/{id}', response_model=Task)
 async def get_task(id: str):
     task = await get_one_task_id(id)
     if task:
@@ -32,9 +32,12 @@ async def get_task(id: str):
     raise HTTPException(404, f'Task not found with id: {id}')
 
 @app.put('/api/tasks/{id}')
-async def update_task(id: int):
+async def update_task(id: str):
     return 'updating task'
 
 @app.delete('/api/tasks/{id}')
-async def delete_task(id: int):
-    return 'deleting task'
+async def delete_task(id: str):
+    task = await get_one_task_id(id)
+    if task:
+        return task
+    raise HTTPException(404, f'Task not found with id: {id}')
