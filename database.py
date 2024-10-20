@@ -8,6 +8,7 @@ database = client.taskdatabase
 collection = database.tasks
 
 
+
 async def get_one_task_id(id):
     task = await collection.find_one({"_id": ObjectId(id)})
     return task
@@ -42,5 +43,7 @@ async def delete_task(id:str):
     await collection.delete_one({"_id": ObjectId(id)})
     return True
 
-
+async def delete_all_task():
+    await collection.delete_many({})
+    return True
 
