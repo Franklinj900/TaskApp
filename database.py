@@ -1,11 +1,22 @@
-from motor.motor_asyncio import AsyncIOMotorClient
-from models import Task
+from models import Task, UpdateTask
 from bson import ObjectId
+import motor.motor_asyncio
 
+uri = "mongodb+srv://osegutierrez1607:Fr38850172@franklin.ic65u.mongodb.net/?retryWrites=true&w=majority&appName=Franklin"
 
-client = AsyncIOMotorClient('mongodb+srv://osegutierrez1607:Fr38850172@cluster0.ic65u.mongodb.net/')
-database = client.taskdatabase
-collection = database.tasks
+# Create a new client and connect to the server
+client = motor.motor_asyncio.AsyncIOMotorClient(uri)
+
+try:
+    client.admin.command('ping')
+    print("Conectado a MongoDB!")
+except Exception as e:
+    print(f"Error al conectar: {e}")
+
+# Send a ping to confirm a
+    
+db = client["taskdatabase"]
+collection = db["tasks"]
 
 
 
@@ -14,12 +25,12 @@ async def get_one_task_id(id):
     return task
 
 
-
 async def get_one_task(title):
     task = await collection.find_one({"title": title})
     return task
 
-async def get_all_task():
+
+async def get_all_tasks():
     tasks = []
     cursor = collection.find({})
     async for document in cursor:
@@ -27,23 +38,19 @@ async def get_all_task():
     return tasks
 
 
-async def create_task(task):
+async def create_task(task: Task):
     new_task = await collection.insert_one(task)
     created_task = await collection.find_one({"_id": new_task.inserted_id})
     return created_task
 
-async def update_task(id:str, data):
-    task = {k: v for k, v in data.dict().items() if v is not None}
-    print(task)
-    await collection.update_one({'_id': ObjectId(id)}, {'$set': task})
-    updated_task = await collection.find_one({"_id": ObjectId(id)})
-    return updated_task
 
-async def delete_task(id:str):
+async def update_task(id: str, data: UpdateTask):
+    task = {k: v for k, v in data.dict().items() if v is not None}
+    await collection.update_one({"_id": ObjectId(id)}, {"$set": task})
+    document = await collection.find_one({"_id": ObjectId(id)})
+    return document
+
+
+async def delete_task(id):
     await collection.delete_one({"_id": ObjectId(id)})
     return True
-
-async def delete_all_task():
-    await collection.delete_many({})
-    return True
-
